@@ -1,0 +1,57 @@
+title: ForceField
+description: >-
+  Security hardening for Claude Code: threat model, hook reference,
+  configuration, architecture, and log reference.
+
+url: https://magonia-research.github.io
+baseurl: /forcefield-docs
+
+repository: Magonia-Research/forcefield-docs
+
+# Pinned to a tag rather than the default branch so a theme release cannot
+# change this site without a commit here.
+remote_theme: just-the-docs/just-the-docs@v0.12.0
+
+plugins:
+  - jekyll-relative-links
+  - jekyll-seo-tag
+  - jekyll-include-cache
+
+# Rewrites the source docs' relative .md cross-links (including anchors and the
+# logging/ subdirectory) to their built URLs, so the same files work in the
+# ForceField repo and here.
+relative_links:
+  enabled: true
+  collections: false
+
+exclude:
+  - README.md
+  - .gitignore
+
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  rel_url: true
+  button: false
+
+heading_anchors: true
+
+aux_links:
+  ForceField on GitHub:
+    - https://github.com/Magonia-Research/ForceField
+aux_links_new_tab: false
+
+nav_external_links:
+  - title: ForceField on GitHub
+    url: https://github.com/Magonia-Research/ForceField
+
+back_to_top: true
+back_to_top_text: Back to top
+
+footer_content: >-
+  ForceField is GPL-3.0-or-later. Documentation source is maintained in
+  <a href="https://github.com/Magonia-Research/ForceField/tree/main/docs"><code>Magonia-Research/ForceField</code>
+  under <code>docs/</code></a>. Edit it there, not here.
