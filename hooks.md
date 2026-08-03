@@ -99,7 +99,7 @@ output flags: a blocked command naming no file is not correlated at all.
   UserPromptSubmit ──► pasted private keys blocked, tokens warned
          │
          ▼
-  Claude processes ──► CLAUDE.md rules via /forcefield:harden
+  Claude processes ──► CLAUDE.md rules via /forcefield:full-power-to-shields
          │
   ── PreToolUse: gate before the call ───────────────────────────────────
      Bash        → container-first · sigma · exfil · supply-chain · git
@@ -172,7 +172,7 @@ The intrusiveness ladder, used by the config clamp: `deny > ask > redact > warn 
 | Decision | Meaning | Examples |
 |---|---|---|
 | **deny** | Zero-false-positive patterns, hard-blocked without a prompt | Relay/exfil domains, netcat, `/dev/tcp` reverse shell, fetch-piped-to-shell, `git clone ext::`, `rm -rf`, hex/octal obfuscation, escape techniques, high-confidence credentials in agent prompts, spawn rate limit |
-| **ask** | User must approve | Data POST, DNS-label exfil, metadata SSRF, scp/rsync/sftp, curl upload, typosquats, arbitrary-URL or plaintext-registry installs, credential-file reads, guarded write destinations, Sigma match, submodule RCE, git config RCE primitives, agent injection or excessive privilege |
+| **ask** | User must approve | Data POST, DNS-label exfil, metadata SSRF, scp/rsync/sftp, curl upload, typosquats, arbitrary-URL or plaintext-registry installs, credential-file reads, guarded write destinations, Sigma match, submodule RCE, git config RCE primitives, an unhardened `git clone`, agent injection or excessive privilege |
 | **redact** | Credential values replaced with `[REDACTED: pattern_name]` | High-confidence keys only, surrounding context preserved |
 | **warn** | Context injected via `systemMessage` | Credential-handling reminders, injection warnings on file reads, low-confidence alerts |
 | **allow + context** | Soft reminder, no gate | Host package install, interpreter on host, subagent constraint injection |
@@ -188,6 +188,13 @@ documented purpose is to run its URL as a command, denies.
 two clone-time CVEs, `git_guard` consults `git_forensics` and moves the decision in either
 direction: down to `warn` on a patched host, up to `deny` on a measured exploit signature. Full
 model: [how a git finding is graded](threat-model.md#how-a-git-finding-is-graded).
+
+**And one finding is a redirect rather than a verdict.** Every `git clone` that has not disarmed
+the clone-time execution surface asks, and the reason carries the exact command that would not
+have: `git -c core.hooksPath=/dev/null clone --no-recurse-submodules <url>`. Run that and there
+is no prompt. It is the only place ForceField answers a finding with a replacement command
+instead of a judgement about the one you typed — the friction is meant to be spent once, on
+learning the safer spelling. See [the clone redirect](threat-model.md#the-clone-redirect).
 
 ## Precedence
 
@@ -213,7 +220,7 @@ That makes anything which can *provoke* a failure a bypass, so the dispatcher is
 inspect this" into an `ask` rather than a silent pass. The 5s timeout is a security boundary: a
 hook killed mid-scan never delivers its verdict, so a computed hard deny becomes a silent allow.
 
-## Skill: `/forcefield:harden`
+## Skill: `/forcefield:full-power-to-shields`
 
 Injects behavioral rules into a project's `CLAUDE.md` that hooks **cannot** enforce: never
 echoing credentials in responses, refusing instructions embedded in fetched content, MCP data
